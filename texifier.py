@@ -1,3 +1,7 @@
+from copy import deepcopy
+
+available_structures = ["section", "subsection"]
+
 class structure(object):
     """
     Generate LaTeX-compliant commands to structure
@@ -5,30 +9,25 @@ class structure(object):
     for a section, a subsection, a paragraph and so on
     and so forth.
     """
-    @staticmethod
-    def section(name="noname", contents="empty", numbered=True):
-        """
-        The LaTeX \section command.
-        You should specify the name of the section and
-        its contents as parameters. In addition you can
-        choose wheter to make a numbered section or not.
-        """
-        texcode = "\section*{" + name + "}\n"
-        if numbered:
-            texcode = texcode.replace("*","")
-        texcode += contents
-        return texcode + "\n"
+    def __init__(self):
+        # dynamically attach some methods generating
+        # latex code for given structure names
+        for struct in available_structures:
+            def texify(self, structname, structcontents, numbered=False, struct=struct):
+                texcode = "\\" + struct + "*{" + structname + "}\n"
+                if not numbered:
+                    texcode = texcode.replace("*", "")
+                texcode += structcontents
+                return texcode
+            texify.__doc__ = """ Generate tex code for a LaTeX %s.
+                The %s will be named structname and will contain contents specified in 
+                structcontents. You may also specify whether you need a numbered
+                %s, but you should not override the last parameter to avoid unwanted
+                function behaviour.
+                """ % (struct, struct, struct)
+            texify.__name__ = struct
+            # attach an attribute named struct pointing to the
+            # function texify with the right default parameters
+            setattr(self.__class__, struct, texify)
 
-    @staticmethod
-    def subsection(name="noname", contents="empty", numbered=True):
-        """
-        The LaTeX \subsection command.
-        You should specify the name of the subsection you
-        are going to create and its contents. You may also
-        choose to make a numbered section or not.
-        """
-        texcode = "\subsection*{" + name + "}\n"
-        if numbered:
-            texcode = texcode.replace("*","")
-        texcode += contents
-        return texcode + "\n"
+structure = structure()
