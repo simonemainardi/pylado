@@ -6,6 +6,9 @@ sys.path.insert(0,parentdir)
 from texifier import structure as s
 from document import document
 
+if not os.path.exists("output"):
+    os.makedirs("output")
+
 # instantiate a new document, specifying its title and the name
 # of the author
 d = document(author="Simone Mainardi", title="Yet Another \LaTeX{} report")
