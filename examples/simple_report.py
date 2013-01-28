@@ -3,7 +3,7 @@ import random
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0,parentdir)
 
-from structure import structure as s
+from texifier import structure as s
 from document import document
 
 # instantiate a new document, specifying its title and the name
