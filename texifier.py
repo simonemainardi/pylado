@@ -20,7 +20,7 @@ class structure(object):
                 texcode = "\\" + struct + "*{" + structname + "}\n"
                 if not numbered:
                     texcode = texcode.replace("*", "")
-                texcode += structcontents
+                texcode += structcontents + "\n"
                 return texcode
             texify.__doc__ = '''
                 Generate tex code for a LaTeX %s.
