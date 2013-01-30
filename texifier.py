@@ -1,7 +1,82 @@
-from copy import deepcopy
+import subprocess
+from os.path import dirname
 
 available_structures = ["section", "subsection"]
 available_summaries = ["tableofcontents", "listoffigures", "listoftables"]
+
+class texdocument(object):
+    """
+    This is a LaTeX document. You can attach structures,
+    figures, images to this class in order to have a final
+    latex document
+    """
+    def __init__(self, **docargs):
+        if not docargs.has_key("class"):
+            docargs["class"] = "article"
+        if not docargs.has_key("title"):
+            docargs["title"] = "Unspecified Title"
+        if not docargs.has_key("author"):
+            docargs["author"] = "Unspecified Author"
+            
+        # it is required to escape \t, \a, \b
+        tex = '''\documentclass{%(class)s}
+\usepackage{graphicx}
+\\title{%(title)s}
+\\author{%(author)s}
+\date{\\today}
+\\begin{document}
+\maketitle
+''' % docargs
+        self._tex = tex
+
+    def append(self, tex):
+        self._tex += tex
+
+    def get_tex(self):
+        return self._tex
+
+    def write_tex(self, output):
+        """
+        Write current LaTeX document to file output.
+        Returns the name and the path of the generated file
+        """
+        if not isinstance(output, basestring):
+            raise Exception("Specify a valid file name")
+
+        # finalize the document
+        self._tex += "\end{document}\n"
+
+        # if the file does not end with ".tex"
+        # we add this extension since we like it :)
+        if not output.endswith(".tex"):
+            output += ".tex"
+
+        file(output, "w").write(self._tex)
+        return output
+
+    def generate_pdf(self, output):
+        if not isinstance(output, basestring):
+            raise Exception("Specify a valid file name")
+
+        # if output ends with ".pdf"
+        # we remove the extension since it is automatically
+        # added by the compiler
+        if output.endswith(".pdf"):
+            output = output[:-4]
+
+        
+        # write the tex file removing the extension
+        texfile = self.write_tex(output)
+
+        params = "-interaction=nonstopmode -output-directory=%s " % dirname(texfile)
+        params += texfile
+        # now call pdflatex TWICE
+        # otherwise
+        # references and labels numbering will not
+        # be displayes
+        for i in xrange(2):
+            subprocess.check_call("pdflatex " + params, shell=True)
+
 
 class structure(object):
     """
@@ -82,3 +157,4 @@ class structure(object):
         return tex
 
 structure = structure()
+
