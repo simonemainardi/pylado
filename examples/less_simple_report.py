@@ -22,10 +22,14 @@ d.append(s.abstract(randomcontent))
 # add the table of contents
 d.append(s.tableofcontents())
 
-# add the table of figures
+# add the list of tables
+d.append(s.listoftables())
+
+# add the list of figures
 d.append(s.listoffigures())
 
-# create five sections, each one with and image and three subsections
+
+# create five sections, each one with an image, a table and three subsections
 for sec in xrange(5):
     # add the section ...
     d.append(s.section("Senseless Section %i" % (sec + 1), randomcontent))
@@ -34,6 +38,19 @@ for sec in xrange(5):
     d.append(s.image("images/a_graph.eps",
                      "This is the senseless graph of Section %i" % (sec+1),
                      "width=.96\\textwidth"))
+
+
+    # ... the table
+    ncols = random.randint(2,5)
+    nrows = random.randint(10,20)
+    heads = ["Property %i"%i for i in xrange(ncols)]
+    rows = [[random.randint(0,i) for i in xrange(ncols)] for c in xrange(nrows)]
+
+    # the table has (or has not) headers:
+    if random.randint(0,1): # with headers
+        d.append(s.table(justs=("l"*ncols), rows=rows, headers=heads, caption="A senseless table in Section %i" % (sec+1)))
+    else: # without headers
+        d.append(s.table(justs=("l"*ncols), rows=rows, caption="A senseless table in Section %i" % (sec+1)))
 
     # and the subsections
     for sub in xrange(3):
